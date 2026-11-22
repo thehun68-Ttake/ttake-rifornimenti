@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TTake Aerobatic Team</title>
+<meta name="theme-color" content="#F3F5F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D110F" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TTake Fuel">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="top">
+      <img class="logo" alt="Logo TTake Aerobatic Team" src="logo.png" width="52" height="54">
+      <div class="brand">
+        <h1>TTake Aerobatic Team</h1>
+        <p><span>Registro rifornimenti &middot; US gal</span><span><i class="dot" id="st-dot"></i> <span id="st-txt">Avvio&hellip;</span></span></p>
+      </div>
+    </div>
+    <div class="stripe" aria-hidden="true"><i></i><i></i><i></i></div>
+  </header>
+
+  <main>
+    <section id="view-nuovo" aria-labelledby="form-title">
+      <div class="sect-head"><h2 id="form-title">Nuovo rifornimento</h2></div>
+      <div id="conn-banner" class="banner" hidden>Manca il codice di accesso. Inseriscilo nella scheda Elenchi, sezione Collegamento, per condividere i dati con gli altri operatori.</div>
+      <form id="f" novalidate autocomplete="off" class="stack">
+        <div class="card">
+          <div class="grid">
+            <div class="field"><label for="f-date">Data</label><input id="f-date" type="date" required></div>
+            <div id="combo-slot" style="display:contents"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="grid">
+            <div class="field">
+              <label for="f-start">Contatore iniziale</label>
+              <input id="f-start" class="num" type="text" inputmode="decimal" placeholder="0,0">
+              <button type="button" class="chipbtn" id="use-last" data-act="use-last" hidden></button>
+              <div class="hint" id="start-hint"></div>
+            </div>
+            <div class="field">
+              <label for="f-end">Contatore finale</label>
+              <input id="f-end" class="num" type="text" inputmode="decimal" placeholder="0,0">
+              <div class="hint" id="end-hint"></div>
+            </div>
+          </div>
+          <div class="field" style="margin-top:14px">
+            <label for="f-gal">Galloni US erogati</label>
+            <div class="readout"><input id="f-gal" type="text" inputmode="decimal" placeholder="0,00"><span class="unit">US gal</span></div>
+            <div class="hint" id="gal-hint">Si calcolano da finale meno iniziale. Puoi correggerli a mano.</div>
+          </div>
+        </div>
+        <div id="f-err" class="err" role="alert" hidden></div>
+        <div class="actions">
+          <button class="btn primary" id="f-save" type="submit">Registra rifornimento</button>
+          <button class="btn" id="f-cancel" type="button" hidden>Annulla modifica</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="view-registro" hidden aria-labelledby="log-title">
+      <div class="sect-head"><h2 id="log-title">Registro</h2><span id="log-count" class="muted"></span></div>
+      <div class="filters" id="filters-log"></div>
+      <div id="log-list" class="log"></div>
+    </section>
+
+    <section id="view-riepilogo" hidden aria-labelledby="sum-title">
+      <div class="sect-head"><h2 id="sum-title">Riepilogo</h2></div>
+      <div class="filters" id="filters-sum"></div>
+      <div id="sum-body" class="stack"></div>
+      <div class="card" id="mail-card" style="margin-top:16px">
+        <h3>Invia il riepilogo</h3>
+        <div class="grid">
+          <div class="field"><label for="mail-to">Destinatario</label><input id="mail-to" type="email" inputmode="email" autocapitalize="off" autocorrect="off" placeholder="nome@esempio.it"></div>
+          <div class="field"><label class="lbl" for="mail-list">Contenuto</label><label class="check"><input type="checkbox" id="mail-list" checked> Includi l'elenco dei rifornimenti</label></div>
+        </div>
+        <div class="actions" style="margin-top:14px">
+          <a class="btn primary" id="mail-go" href="mailto:">Apri in Mail</a>
+          <button class="btn" type="button" data-act="copy">Copia testo</button>
+          <button class="btn" type="button" data-act="csv">Condividi CSV</button>
+        </div>
+        <p class="note" id="mail-note"></p>
+        <details><summary>Anteprima del messaggio</summary><pre id="mail-pre"></pre></details>
+      </div>
+    </section>
+
+    <section id="view-elenchi" hidden aria-labelledby="lists-title">
+      <div class="sect-head"><h2 id="lists-title">Elenchi</h2></div>
+      <div class="lists" id="lists-grid"></div>
+      <p class="note">Togliere una voce dall'elenco non cancella i rifornimenti già registrati. Le nuove voci si possono aggiungere anche direttamente dal modulo.</p>
+
+      <div class="card" id="conn-card" style="margin-top:16px">
+        <h3>Collegamento</h3>
+        <div class="grid">
+          <div class="field"><label for="c-url">Indirizzo Google Sheets (script)</label><input id="c-url" type="url" inputmode="url" autocapitalize="off" autocorrect="off" placeholder="https://script.google.com/macros/s/.../exec"></div>
+          <div class="field"><label for="c-token">Codice di accesso</label><input id="c-token" type="password" autocapitalize="off" autocorrect="off" autocomplete="off"></div>
+        </div>
+        <div class="actions" style="margin-top:14px"><button class="btn primary" type="button" id="c-save">Salva e verifica</button></div>
+        <p class="note" id="c-note"></p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="tabbar"><nav role="tablist" aria-label="Sezioni">
+  <button class="tab" role="tab" data-tab="nuovo" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c3.5 4.2 6 7.2 6 10.5a6 6 0 0 1-12 0C6 10.2 8.5 7.2 12 3Z"/><path d="M12 11v5M9.5 13.5h5"/></svg>Nuovo</button>
+  <button class="tab" role="tab" data-tab="registro" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>Registro</button>
+  <button class="tab" role="tab" data-tab="riepilogo" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 5H7l6 7-6 7h11"/></svg>Riepilogo</button>
+  <button class="tab" role="tab" data-tab="elenchi" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Elenchi</button>
+</nav></div>
+<div id="toast-slot" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
